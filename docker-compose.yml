@@ -1,0 +1,13 @@
+version: "3"
+services:
+  lambda:
+    build: .
+    env_file:
+      - ./.env
+    ports:
+      - 9000:8080
+
+# docker-compose up lambda
+# In separate terminal end the following
+# in powershell:  curl -XPOST "http://localhost:9000/2015-03-31/functions/function/invocations" -d "{\"test\": \"Hello, World!\"}"
+# in bash:        curl -XPOST "http://localhost:9000/2015-03-31/functions/function/invocations" -d '{"test": "Hello, World"}'
