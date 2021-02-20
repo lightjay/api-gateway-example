@@ -1,13 +1,51 @@
 version: "3"
 services:
   lambda:
+    image: amazon/aws-lambda-nodejs:12
     build: .
-    env_file:
-      - ./.env
+#    env_file:
+#      - ./.env
+#    volumes:
+#      - ./app/src/:/var/task/
     ports:
       - 9000:8080
+    command: [ "app.handler" ]
 
-# docker-compose up lambda
+# docker-compose up --build lambda
 # In separate terminal end the following
 # in powershell:  curl -XPOST "http://localhost:9000/2015-03-31/functions/function/invocations" -d "{\"test\": \"Hello, World!\"}"
 # in bash:        curl -XPOST "http://localhost:9000/2015-03-31/functions/function/invocations" -d '{"test": "Hello, World"}'
+
+  db1:
+    image: mysql:8.0
+    command: --default-authentication-plugin=mysql_native_password --secure-file-priv=/docker-entrypoint-initdb.d
+    restart: always
+    env_file:
+      - ./sql/db1/.env
+    environment:
+      - MYSQL_DATABASE=localtest1
+    ports:
+      - 3306:3306
+    volumes:
+      - ./sql/db1/ddl:/docker-entrypoint-initdb.d
+#      - ../db-name/db-files:/var/lib/mysql  #If you use this make sure to ommit the MYSQL_ROOT_PASSWORD from env vars
+
+  db2:
+    image: postgres:13
+    restart: always
+    env_file:
+      - ./sql/db2/.env
+    environment:
+      - POSTGRES_DB=localtest2
+    ports:
+      - 5432:5432
+    volumes:
+      - ./sql/db2/ddl:/docker-entrypoint-initdb.d
+
+  neo:
+    image: neo4j
+    ports:
+      - 7474:7474
+      - 7687:7687
+    env_file:
+      - ./sql/neo4j/.env
